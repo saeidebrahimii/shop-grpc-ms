@@ -1,5 +1,5 @@
 {
-  "name": "shopping_ms_shopping",
+  "name": "shopping-service",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
