@@ -4,38 +4,69 @@ const path = require("path");
 const config = require("./config/config");
 const ProductService = require("./services/product.service");
 
-const PROTO_PATH = path.join(__dirname, "/../proto/product.proto");
+const PROTO_PATH = path.join(__dirname, "../proto/product.proto");
 
-const packageDef = protoLoader.loadSync(PROTO_PATH);
+const packageDef = protoLoader.loadSync(PROTO_PATH, {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
 const proto = grpc.loadPackageDefinition(packageDef).product;
 
 const service = new ProductService();
-// تعریف متد gRPC
-async function GetProduct(call, callback) {
-  const productId = call.request.id;
-  const product = await service.getProduct(productId);
 
-  if (!product) {
-    return callback({
-      code: grpc.status.NOT_FOUND,
-      message: "Product not found",
+async function GetProduct(call, callback) {
+  try {
+    const productId = call.request.id;
+    const product = await service.getProduct(productId);
+
+    if (!product) {
+      return callback({
+        code: grpc.status.NOT_FOUND,
+        message: "Product not found",
+      });
+    }
+
+    const result = {
+      id: product._id.toString(),
+      title: product.title,
+      description: product.description,
+      image: product.image,
+      category: product.category,
+      price: product.price,
+      qty: product.qty,
+    };
+
+    callback(null, result);
+  } catch (err) {
+    console.error("gRPC GetProduct Error:", err);
+    callback({
+      code: grpc.status.INTERNAL,
+      message: "Internal server error",
     });
   }
-
-  callback(null, product);
 }
 
-// ساخت و راه‌اندازی سرور gRPC
-const server = new grpc.Server();
+function startGrpcServer() {
+  const server = new grpc.Server();
 
-server.addService(proto.ProductService.service, {
-  GetProduct,
-});
+  server.addService(proto.ProductService.service, {
+    GetProduct,
+  });
 
-server.bindAsync(
-  config.gRPC.url,
-  grpc.ServerCredentials.createInsecure(),
-  () => {
-    console.log(`🚀 gRPC Product Service running on port ${config.gRPC.port}`);
-  }
-);
+  server.bindAsync(
+    config.gRPC.url,
+    grpc.ServerCredentials.createInsecure(),
+    (err, port) => {
+      if (err) {
+        console.error("gRPC bind error:", err);
+        return;
+      }
+      console.log(`🚀 gRPC Product Service running on port ${port}`);
+    }
+  );
+}
+
+startGrpcServer();

@@ -3,13 +3,12 @@ const customerController = require("../controllers/customer.controller");
 const { authGuard } = require("../middlewares/auth.guard");
 const router = Router();
 
-router.get("/",authGuard, customerController.getAllUsers);
-router.post("/",customerController.createUser)
-router.get("/:id",customerController.getUser)
-router.put("/:id",customerController.editUser)
-router.delete("/:id",customerController.deleteUser)
+router.get("/", authGuard, customerController.getAllUsers);
+router.post("/", customerController.createUser);
+router.post("/login", customerController.loginUser);
 
-router.post("/login",customerController.loginUser)
-// router.post("/auth/validate",)
+router.get("/:id", authGuard, customerController.getUser);
+router.put("/:id", authGuard, customerController.editUser);
+router.delete("/:id", authGuard, customerController.deleteUser);
 
 module.exports = { indexRoutes: router };

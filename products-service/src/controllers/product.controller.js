@@ -10,8 +10,9 @@ class ProductController {
   }
   async getAllProducts(req, res) {
     try {
-      const products = await this.#service.getAllProducts();
-      res.json(products);
+      const { page = 1, limit = 10 } = req.query;
+      const result = await this.#service.getPaginatedProducts(+page, +limit);
+      res.json(result);
     } catch (error) {
       res.status(500).json({ msg: "Error fetch all products." });
     }
@@ -42,7 +43,7 @@ class ProductController {
       );
       return res.json(product);
     } catch (error) {
-      if (fs.existsSync(path)) [fs.unlinkSync(path)];
+      if (fs.existsSync(path)) fs.unlinkSync(path);
       res.status(500).json({ msg: "Error create product." });
     }
   }

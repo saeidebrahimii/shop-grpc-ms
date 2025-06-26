@@ -1,0 +1,28 @@
+syntax="proto3";
+package cart;
+service CartService{
+    rpc GetCart (GetCartRequest) returns (GetCartResponse);
+    rpc LockedCart (LockedCartRequest) returns (LockedCartResponse);
+    rpc PaidCart (PaidCartRequest) returns (PaidCartResponse);
+}
+message PaidCartRequest{
+    string id =1;
+}
+message PaidCartResponse{
+    string status =1;
+}
+message GetCartRequest{
+    string id =1;
+}
+message GetCartResponse{
+    string id =1;
+    bool valid =2;
+    string userId = 3;
+    string status = 4;
+}
+message LockedCartRequest{
+    string id =1;
+}
+message LockedCartResponse{
+    bool status=1;
+}

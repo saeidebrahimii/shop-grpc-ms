@@ -6,6 +6,7 @@ module.exports = {
     port: process.env.PORT,
   },
   gRPC: {
+    port:process.env.GRPC_PORT,
     url: `${process.env.GRPC_DOMAIN}:${process.env.GRPC_PORT}`,
     product: {
       url: process.env.GRPC_PRODUCT_URL,

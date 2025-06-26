@@ -1,12 +1,11 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
-async function generateJwtToken(payload) {
+
+function generateJwtToken(payload) {
   const access_token = jwt.sign(
     payload,
     Buffer.from(config.app.jwt.access_secret_token, "base64").toString(),
-    {
-      expiresIn: "2w",
-    }
+    { expiresIn: "2w" }
   );
   const refresh_token = jwt.sign(
     payload,
@@ -15,11 +14,16 @@ async function generateJwtToken(payload) {
   );
   return { access_token, refresh_token };
 }
-async function verifyJwtToken(token) {
-  const decoded = jwt.verify(
-    token,
-    Buffer.from(config.app.jwt.access_secret_token, "base64").toString()
-  );
-  return decoded;
+
+function verifyJwtToken(token, type = "access") {
+  const secret = Buffer.from(
+    type === "access"
+      ? config.app.jwt.access_secret_token
+      : config.app.jwt.refresh_secret_token,
+    "base64"
+  ).toString();
+
+  return jwt.verify(token, secret);
 }
-module.exports = { generateJwtToken,verifyJwtToken };
+
+module.exports = { generateJwtToken, verifyJwtToken };

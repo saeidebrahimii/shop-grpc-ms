@@ -68,18 +68,21 @@ class CustomerController {
   async editUser(req, res) {
     try {
       const { id } = req.params;
+      if (!isValidObjectId(id))
+        return res.status(400).json({ msg: "Invalid user ID." });
+
       if (req.body?.password) {
         req.body.password = await hashPassword(req.body.password);
       }
+
       const editUser = await this.#service.editUser(id, req.body);
       if (editUser?.modifiedCount > 0) {
-        res.json({ msg: "edit user successfully" });
+        res.json({ msg: "User updated successfully." });
       } else {
-        res.status(500).json({ msg: "edit user failed." });
+        res.status(400).json({ msg: "No changes were made to the user." });
       }
-      res.json(editUser);
     } catch (error) {
-      res.status(500).json({ msg: "Error edit user ." });
+      res.status(500).json({ msg: "Error editing user." });
     }
   }
   async loginUser(req, res) {

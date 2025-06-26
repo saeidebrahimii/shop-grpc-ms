@@ -22,6 +22,12 @@ app.use(
     target: "http://localhost:8003",
   })
 );
+app.use(
+  "/payment",
+  createProxyMiddleware({
+    target: "http://localhost:8004",
+  })
+);
 app.use((req, res, next) => {
   res.status(404).json({ msg: "route not found" });
 });
